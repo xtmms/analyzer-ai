@@ -96,7 +96,7 @@ analyzer-ai/
 
 Ideato e sviluppato da:
 * **Tommaso Ianniciello** - *Test Automation Engineer*
-* **GitHub**: [@xtmms](https://github.com/xtmms) (o inserisci il tuo link profilo)
+* **GitHub**: [@xtmms](https://github.com/xtmms)
 
 ---
 
