@@ -1,16 +1,16 @@
-# 🔍 QA Log Analyzer with Gemini API
+# 🔍 AI Log Analyzer with Gemini API
 
-QA Log Analyzer è un'applicazione web interattiva sviluppata in **Python** con **Streamlit** che consente a tester, QA engineer e sviluppatori di caricare file di log, isolare automaticamente errori ed eccezioni (comprese stack trace complesse), e analizzarli istantaneamente tramite l'**API di Gemini** per ricevere un report strutturato e azionabile.
+AI Log Analyzer è un'applicazione web interattiva sviluppata in **Python** con **Streamlit** che consente a sviluppatori, DevOps, SRE, tester e QA engineer di caricare file di log di qualsiasi genere, isolare automaticamente anomalie ed errori, ed analizzarli istantaneamente tramite l'**API di Gemini** per ricevere un report strutturato e azionabile.
 
 ## 🚀 Caratteristiche Principali
 
 - **Caricamento File Semplice**: Trascina e rilascia file di log in formato `.txt` o `.log`.
-- **Filtro Intelligente delle Anomalie**: Estrazione automatica e deduplicazione delle righe contenenti parole chiave di errore (es: `ERROR`, `CRITICAL`, `FATAL`, `EXCEPTION`, `FAIL`).
-- **Parsing delle Stack Trace**: Rilevamento automatico di traceback multi-riga (es: eccezioni Python) per mantenere integro il contesto dell'errore.
+- **Filtro Intelligente delle Anomalie**: Estrazione automatica e classificazione delle righe contenenti livelli di severità critici (`CRITICAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`).
+- **Parsing delle Stack Trace**: Rilevamento automatico di traceback multi-riga (es. Java, Python) per mantenere integro il contesto dell'errore.
 - **Report Strutturato in 3 Punti con Gemini**:
-  1. **Sintesi delle Problematiche**: Panoramica ad alto livello degli errori rilevati, con la loro frequenza e gravità.
-  2. **Analisi Tecnica e Cause Radice (Root Cause Analysis)**: Spiegazione dettagliata sul perché gli errori si sono verificati basandosi sui messaggi e i traceback forniti.
-  3. **Piano di Azione e Risoluzione**: Raccomandazioni pratiche ed operative per il team QA (per la riproduzione/test) e per gli sviluppatori (per il bug fixing).
+  - **Sintesi delle Problematiche**: Panoramica ad alto livello degli eventi anomali rilevati e del loro impatto.
+  - **Analisi Tecnica e Cause Radice (Root Cause Analysis)**: Spiegazione tecnica dettagliata sulle cause basandosi sui messaggi e i traceback forniti.
+  - **Piano di Azione e Risoluzione**: Raccomandazioni pratiche, correzioni di bug, modifiche infrastrutturali o configurazioni di sistema.
 - **Controllo Parametri**: Scelta del modello (`gemini-2.5-flash` o `gemini-2.5-pro`), regolazione della temperatura e personalizzazione delle parole chiave del filtro direttamente dalla UI.
 - **Esportazione in Markdown**: Possibilità di scaricare il report generato con un click.
 
