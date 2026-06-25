@@ -1,82 +1,80 @@
-# 🔍 AI Log Analyzer with Gemini API
+# 🔍 AI Log Analyzer
 
-AI Log Analyzer è un'applicazione web interattiva sviluppata in **Python** con **Streamlit** che consente a sviluppatori, DevOps, SRE, tester e QA engineer di caricare file di log di qualsiasi genere, isolare automaticamente anomalie ed errori, ed analizzarli istantaneamente tramite l'**API di Gemini** per ricevere un report strutturato e azionabile.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-green.svg)](https://www.python.org/)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-1.35+-red.svg)](https://streamlit.io/)
+
+**AI Log Analyzer** è una moderna e potente applicazione web interattiva sviluppata in **Python** e **Streamlit** che sfrutta i modelli avanzati di **Gemini AI** per assistere SRE, DevOps, sviluppatori e QA Engineer nell'analisi dei log applicativi e infrastrutturali. 
+
+Il tool automatizza l'estrazione delle anomalie, categorizza i messaggi di errore per gravità, stima in tempo reale i costi di utilizzo delle API di intelligenza artificiale ed elabora un report strutturato (Root Cause Analysis e raccomandazioni di fix) ad altissime prestazioni e precisione grazie agli **Structured Outputs** nativi di Google.
+
+---
 
 ## 🚀 Caratteristiche Principali
 
-- **Caricamento File Semplice**: Trascina e rilascia file di log in formato `.txt` o `.log`.
-- **Filtro Intelligente delle Anomalie**: Estrazione automatica e classificazione delle righe contenenti livelli di severità critici (`CRITICAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`).
-- **Parsing delle Stack Trace**: Rilevamento automatico di traceback multi-riga (es. Java, Python) per mantenere integro il contesto dell'errore.
-- **Report Strutturato in 3 Punti con Gemini**:
-  - **Sintesi delle Problematiche**: Panoramica ad alto livello degli eventi anomali rilevati e del loro impatto.
-  - **Analisi Tecnica e Cause Radice (Root Cause Analysis)**: Spiegazione tecnica dettagliata sulle cause basandosi sui messaggi e i traceback forniti.
-  - **Piano di Azione e Risoluzione**: Raccomandazioni pratiche, correzioni di bug, modifiche infrastrutturali o configurazioni di sistema.
-- **Controllo Parametri**: Scelta del modello (`gemini-2.5-flash` o `gemini-2.5-pro`), regolazione della temperatura e personalizzazione delle parole chiave del filtro direttamente dalla UI.
-- **Esportazione in Markdown**: Possibilità di scaricare il report generato con un click.
+* **Parsing Multiformato & Rilevamento Traceback**: Parsing intelligente dei log con supporto al raggruppamento di stack trace complesse multi-riga (es. Java Spring Boot Exception, Python Tracebacks), evitando la frammentazione del log.
+* **Dashboard Statistica Interattiva**: Visualizzazione immediata della ripartizione delle severità dei log (`CRITICAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`) tramite un grafico donut interattivo di **Plotly** e metriche riassuntive.
+* **Evidenziatore Sintattico Ultra-Veloce**: Un sistema di colorazione sintattica lato server (Python) che evidenzia severity, logger ed espressioni di file in HTML in meno di 1ms, garantendo zero freeze o rallentamenti nel browser.
+* **Structured Outputs con Gemini API (Pydantic)**: Integrazione dello schema rigido `LogAnalysisReport` tramite l'SDK `google-genai`. Le risposte di Gemini vengono fornite direttamente in JSON garantendo che il report finale in 3 punti sia sempre formattato con precisione nelle rispettive schede della UI.
+* **Pannello di Stima dei Costi in Tempo Reale**: Calcolo preventivo e dinamico dei costi stimati delle API di input (prompt) e output (risposta) in base alle tariffe ufficiali del listino dei modelli Gemini (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-1.5-flash`), con suggerimenti sul modello più conveniente.
+* **Selezione Log Intelligente e Filtri Avanzati**:
+  - Filtro multi-selezione per severità di log.
+  - Filtro di ricerca testuale dinamico con supporto alle **espressioni regolari (Regex)**.
+  - Ordinamento flessibile per selezionare se analizzare le **Prime N** o le **Ultime N** righe (ottimo per isolare il crash finale).
+* **Persistenza della Sessione**: I report e i dati generati persistono nello stato di Streamlit anche in caso di re-run causati dall'interazione con l'interfaccia, resettandosi solo al caricamento di un nuovo file.
 
 ---
 
 ## 🛠️ Tecnologie Utilizzate
 
-- **Python 3.14+**
-- **Streamlit** (UI Reattiva e Moderna)
-- **Google GenAI SDK** (`google-genai`)
-- **RegEx** per il filtraggio e l'estrazione strutturata dei testi
+* **Python 3.10+** (Testato fino a Python 3.14)
+* **Streamlit** (Interfaccia Utente reattiva e orientata alla Dark Mode)
+* **Google GenAI SDK** (`google-genai` >= 0.1.1)
+* **Plotly Express** (Grafici interattivi)
+* **Pydantic v2** (Validazione e garanzia degli output strutturati)
 
 ---
 
 ## 📋 Prerequisiti
 
-Assicurati di avere installato sul tuo sistema:
-- Python 3.10 o superiore (testato con Python 3.14)
-- Un account Google AI Studio per ottenere una **Gemini API Key** (gratuita)
+* Python 3.10 o versione successiva.
+* Una **Gemini API Key** configurata per le chiamate a Google AI Studio.
 
 ---
 
 ## 💻 Installazione e Configurazione
 
-1. **Clona la repository** o posizionati nella cartella del progetto:
+1. **Posizionati nella cartella del progetto**:
    ```bash
    cd analyzer-ai
    ```
 
-2. **Crea un ambiente virtuale**:
+2. **Inizializza un ambiente virtuale (consigliato)**:
    ```bash
    python3 -m venv .venv
+   source .venv/bin/activate  # Su Windows: .venv\Scripts\activate
    ```
 
-3. **Attiva l'ambiente virtuale**:
-   - **Su macOS/Linux**:
-     ```bash
-     source .venv/bin/activate
-     ```
-   - **Su Windows**:
-     ```cmd
-     .venv\Scripts\activate
-     ```
-
-4. **Installa le dipendenze**:
+3. **Installa le dipendenze richieste**:
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Configura la chiave API (Obbligatoria)**:
-   Crea un file chiamato `.env` nella directory principale del progetto e inserisci la tua chiave API di Gemini:
+4. **Configura la chiave API**:
+   Crea un file `.env` nella cartella radice del progetto e aggiungi la tua chiave:
    ```env
    GEMINI_API_KEY=la_tua_api_key_qui
    ```
-   *Nota: Per ragioni di sicurezza, l'applicazione non permette l'inserimento manuale della chiave API tramite l'interfaccia utente; deve essere configurata obbligatoriamente a livello di sistema o tramite file `.env`.*
 
 ---
 
 ## 🏃‍♂️ Avvio dell'Applicazione
 
-Una volta configurato l'ambiente, avvia l'interfaccia web con il comando:
+Una volta configurato l'ambiente virtuale ed il file `.env`, l'interfaccia web si avvia con il comando:
 ```bash
 streamlit run app.py
 ```
-
-L'applicazione si aprirà automaticamente nel browser all'indirizzo **[http://localhost:8501](http://localhost:8501)**.
+L'applicazione si aprirà automaticamente nel tuo browser all'indirizzo **[http://localhost:8501](http://localhost:8501)**.
 
 ---
 
@@ -84,19 +82,24 @@ L'applicazione si aprirà automaticamente nel browser all'indirizzo **[http://lo
 
 ```
 analyzer-ai/
-├── app.py                # Codice dell'applicazione Streamlit (UI, parser e integrazione Gemini)
-├── requirements.txt      # Dipendenze del progetto
-├── sample_logs.log       # File di log di esempio per i test
-├── .gitignore            # File per escludere file temporanei e chiavi API da Git
-└── README.md             # Questo documento informativo
+├── app.py                     # Codice sorgente dell'app (UI Streamlit, parser log, Gemini)
+├── requirements.txt           # Dipendenze del progetto
+├── sample_logs.log            # Log di esempio standard
+├── complex_sample_logs.log    # Log di esempio complesso da 500 righe
+├── LICENSE                    # Licenza MIT del progetto
+└── README.md                  # Questa guida introduttiva
 ```
 
 ---
 
-## 📝 Esempio di Utilizzo
+## 🧑‍💻 Autore
 
-Per testare subito l'applicazione:
-1. Assicurati che la chiave API sia configurata nel file `.env`.
-2. Avvia l'app e trascina il file di esempio `sample_logs.log` incluso nel progetto.
-3. Controlla le righe di errore estratte nell'area di anteprima.
-4. Clicca su **Genera Report di Analisi con Gemini** e attendi l'output strutturato!
+Ideato e sviluppato da:
+* **Tommaso Ianniciello** - *Test Automation Engineer*
+* **GitHub**: [@xtmms](https://github.com/xtmms) (o inserisci il tuo link profilo)
+
+---
+
+## 📄 Licenza
+
+Questo progetto è rilasciato sotto i termini della **Licenza MIT**. Consulta il file [LICENSE](LICENSE) per ulteriori dettagli.
