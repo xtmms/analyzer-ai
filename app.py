@@ -24,98 +24,382 @@ st.set_page_config(
 # Stile CSS custom per un'estetica premium ed elegante (Dark Mode oriented)
 st.markdown("""
 <style>
-    /* Importa font moderno */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    /* Importazione Font Moderni */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
+    /* Configurazione Layout & Sfondi Globali */
     html, body, [class*="css"] {
         font-family: 'Outfit', sans-serif;
+        color: #e2e8f0;
     }
     
-    /* Titolo ed header principali */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-weight: 600 !important;
+    }
+    
+    [data-testid="stAppViewContainer"] {
+        background-color: #08090d !important;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(127, 90, 240, 0.08) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(167, 139, 250, 0.05) 0px, transparent 50%),
+            radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.03) 0px, transparent 50%) !important;
+        background-attachment: fixed !important;
+    }
+    
+    [data-testid="stHeader"] {
+        background: transparent !important;
+    }
+    
+    [data-testid="stSidebar"] {
+        background-color: #0d0f16 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    }
+    
+    /* Scrollbar Personalizzata */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.01);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(127, 90, 240, 0.4);
+    }
+    
+    /* Titolo Principale della Dashboard */
     .main-title {
+        font-family: 'Space Grotesk', sans-serif;
         font-size: 2.8rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        font-weight: 700;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, #a78bfa 0%, #c084fc 50%, #60a5fa 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.2rem;
     }
     
     .subtitle {
-        font-size: 1.1rem;
-        color: #8892b0;
+        font-size: 1rem;
+        color: #94a3b8;
         margin-bottom: 2rem;
+        font-weight: 400;
+        line-height: 1.5;
     }
     
-    /* Box metriche custom */
-    .metric-card {
-        background-color: #1e222b;
-        border: 1px solid #2d3139;
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .metric-card:hover {
-        transform: translateY(-2px);
-        border-color: #4b6cb7;
-    }
-    .metric-val {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
-    .metric-label {
-        font-size: 0.9rem;
-        color: #8892b0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 5px;
-    }
-    
-    /* Card per i 3 punti del report di Gemini */
-    .report-card {
-        background: rgba(30, 34, 43, 0.7);
-        border-left: 5px solid #4b6cb7;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(10px);
-    }
-    .report-card-1 { border-left-color: #e056fd; } /* Viola per Punto 1 */
-    .report-card-2 { border-left-color: #ff9f43; } /* Arancione per Punto 2 */
-    .report-card-3 { border-left-color: #1dd1a1; } /* Verde/Azzurro per Punto 3 */
-    
-    .report-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 0.8rem;
-        color: #ffffff;
-    }
-    
-    /* Stile per i log e codice */
-    code, pre {
-        font-family: 'JetBrains Mono', monospace !important;
-        font-size: 0.85rem !important;
-    }
-    
-    /* Pulsanti personalizzati */
+    /* Stile dei Pulsanti Streamlit */
     div.stButton > button {
-        background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 0.6rem 2rem !important;
+        background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 0.6rem 2.5rem !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 600 !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3) !important;
-        transition: all 0.3s ease !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 15px rgba(109, 40, 217, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     div.stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(75, 108, 183, 0.5) !important;
+        box-shadow: 0 8px 25px rgba(109, 40, 217, 0.45) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    div.stButton > button:active {
+        transform: translateY(0px) !important;
+    }
+    
+    /* Stile per i Download Button ed altri bottoni secondari */
+    div[data-testid="stDownloadButton"] > button {
+        background: rgba(255, 255, 255, 0.03) !important;
+        color: #e2e8f0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stDownloadButton"] > button:hover {
+        background: rgba(255, 255, 255, 0.07) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* Custom Cards Metriche con Glassmorphism */
+    .metric-card {
+        background: rgba(18, 20, 29, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 14px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(16px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .metric-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(167, 139, 250, 0.3);
+        box-shadow: 0 12px 40px rgba(167, 139, 250, 0.08);
+        background: rgba(18, 20, 29, 0.7);
+    }
+    .metric-val {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
+    .metric-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-top: 8px;
+        font-weight: 600;
+    }
+    
+    /* File Uploader Streamlit */
+    div[data-testid="stFileUploader"] {
+        background-color: rgba(18, 20, 29, 0.4) !important;
+        border: 1px dashed rgba(255, 255, 255, 0.08) !important;
+        border-radius: 14px !important;
+        padding: 1.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+    div[data-testid="stFileUploader"]:hover {
+        border-color: rgba(167, 139, 250, 0.4) !important;
+        background-color: rgba(18, 20, 29, 0.5) !important;
+    }
+    
+    /* Selettori ed Input Streamlit */
+    div[data-baseweb="select"] > div, input[type="text"] {
+        background-color: #12141d !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 10px !important;
+        color: #f1f5f9 !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-baseweb="select"] > div:hover, input[type="text"]:focus {
+        border-color: rgba(167, 139, 250, 0.4) !important;
+    }
+    
+    /* Expanders Streamlit */
+    div[data-testid="stExpander"] {
+        background-color: rgba(18, 20, 29, 0.3) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 14px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        overflow: hidden !important;
+        margin-bottom: 1.5rem !important;
+    }
+    summary[class*="streamlit-expanderHeader"] {
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-weight: 600 !important;
+        color: #f1f5f9 !important;
+        background-color: rgba(18, 20, 29, 0.5) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+        padding: 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    summary[class*="streamlit-expanderHeader"]:hover {
+        background-color: rgba(18, 20, 29, 0.75) !important;
+        color: #ffffff !important;
+    }
+    
+    /* Stile della visualizzazione Log Anteprima */
+    .log-preview {
+        background-color: #0b0d13;
+        color: #f8fafc;
+        padding: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        height: 300px;
+        overflow-y: auto;
+        overflow-x: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        white-space: pre;
+        line-height: 1.5;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    }
+    
+    /* Cards per il Report di Gemini (Punti 1, 2, 3) */
+    .report-card {
+        background: rgba(18, 20, 29, 0.5);
+        border-left: 4px solid #7f5af0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-left-width: 5px;
+    }
+    .report-card-1 { border-left-color: #c084fc; }
+    .report-card-2 { border-left-color: #fb923c; }
+    .report-card-3 { border-left-color: #4ade80; }
+    
+    .report-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        letter-spacing: -0.2px;
+    }
+    
+    .report-content {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        margin-top: 0.75rem;
+    }
+    
+    .report-p {
+        margin-bottom: 1rem;
+    }
+    
+    .report-list {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        padding-left: 1.25rem;
+        list-style-type: disc;
+    }
+    
+    .report-list li {
+        margin-bottom: 0.4rem;
+    }
+    
+    .inline-code {
+        font-family: 'JetBrains Mono', monospace !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f1f5f9 !important;
+        padding: 0.15rem 0.4rem !important;
+        border-radius: 4px !important;
+        font-size: 0.85em !important;
+    }
+    
+    .code-block-preview {
+        background-color: #0b0d13 !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+        overflow-x: auto !important;
+        margin: 1rem 0 !important;
+    }
+    
+    .code-block-preview code {
+        font-family: 'JetBrains Mono', monospace !important;
+        color: #f8fafc !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Card della Stima Costi */
+    .cost-card {
+        background: rgba(18, 20, 29, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(16px);
+    }
+    .cost-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .cost-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        font-size: 0.85rem;
+        margin-top: 12px;
+    }
+    .cost-item {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .cost-label {
+        color: #94a3b8;
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .cost-val {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    .cost-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .cost-total-label {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 1rem;
+    }
+    .cost-total-val {
+        color: #4ade80;
+        font-weight: 700;
+        font-size: 1.3rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+    .cost-suggestion {
+        font-size: 0.8rem;
+        color: #fb923c;
+        margin-top: 12px;
+        background: rgba(251, 146, 60, 0.08);
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(251, 146, 60, 0.15);
+    }
+    
+    /* Livelli di conteggio righe (Badge) */
+    .badge-row-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    .badge-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(18, 20, 29, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 10px;
+        padding: 8px 16px;
+        transition: all 0.2s ease;
+    }
+    .badge-row:hover {
+        background-color: rgba(18, 20, 29, 0.8);
+        border-color: rgba(255, 255, 255, 0.08);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -243,25 +527,25 @@ def colorize_log(text: str) -> str:
     
     # 1. Parentesi quadre (logger/classi) es: [UserController]
     bracket_pattern = re.compile(r'\[([a-zA-Z0-9_]+)\]')
-    escaped = bracket_pattern.sub(r'<span style="color: #a1c4fd; font-weight: 600;">[\1]</span>', escaped)
+    escaped = bracket_pattern.sub(r'<span style="color: #a78bfa; font-weight: 600;">[\1]</span>', escaped)
     
     # 2. Date e timestamp es: 2026-06-25 16:02:22
     timestamp_pattern = re.compile(r'(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?)')
-    escaped = timestamp_pattern.sub(r'<span style="color: #8892b0;">\1</span>', escaped)
+    escaped = timestamp_pattern.sub(r'<span style="color: #64748b;">\1</span>', escaped)
     
-    # 3. Livelli di severità e parole chiave
+    # 3. Livelli di severità e parole chiave (cromaticamente allineati alla nuova palette)
     colors = {
-        "CRITICAL": "#e056fd",
-        "FATAL": "#e056fd",
-        "SEVERE": "#e056fd",
-        "ERROR": "#ff4d4d",
-        "FAIL": "#ff4d4d",
-        "FAILED": "#ff4d4d",
-        "EXCEPTION": "#ff4d4d",
-        "WARNING": "#ff9f43",
-        "WARN": "#ff9f43",
-        "INFO": "#1dd1a1",
-        "DEBUG": "#54a0ff"
+        "CRITICAL": "#ff5555",
+        "FATAL": "#ff5555",
+        "SEVERE": "#ff5555",
+        "ERROR": "#ff6e6e",
+        "FAIL": "#ff6e6e",
+        "FAILED": "#ff6e6e",
+        "EXCEPTION": "#ff6e6e",
+        "WARNING": "#ffb86c",
+        "WARN": "#ffb86c",
+        "INFO": "#50fa7b",
+        "DEBUG": "#8be9fd"
     }
     
     for keyword, col in colors.items():
@@ -270,9 +554,70 @@ def colorize_log(text: str) -> str:
         
     # 4. Righe chiave Traceback
     traceback_pattern = re.compile(r'\b(Traceback \(most recent call last\):|File &quot;[^&]+&quot;, line \d+)\b')
-    escaped = traceback_pattern.sub(r'<span style="color: #ff9f43; font-style: italic;">\1</span>', escaped)
+    escaped = traceback_pattern.sub(r'<span style="color: #ffb86c; font-style: italic;">\1</span>', escaped)
     
     return escaped
+
+
+def markdown_to_html(md_text: str) -> str:
+    """
+    Semplice parser Markdown-to-HTML per formattare il contenuto dei report di Gemini
+    all'interno delle card personalizzate.
+    """
+    import html
+    escaped = html.escape(md_text)
+    
+    # 1. Blocchi di codice: ```python ... ``` -> <pre class="code-block-preview"><code class="language-python">...</code></pre>
+    code_block_pattern = re.compile(r'```([a-zA-Z0-9_-]*)\n(.*?)```', re.DOTALL)
+    def replace_code_block(match):
+        lang = match.group(1)
+        code = match.group(2)
+        return f'<pre class="code-block-preview"><code class="language-{lang}">{code}</code></pre>'
+    escaped = code_block_pattern.sub(replace_code_block, escaped)
+    
+    # 2. Codice inline: `code` -> <code class="inline-code">code</code>
+    escaped = re.sub(r'`([^`\n]+)`', r'<code class="inline-code">\1</code>', escaped)
+    
+    # 3. Grassetto: **testo** -> <strong>testo</strong>
+    escaped = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', escaped)
+    
+    # 4. Liste puntate: raggruppa righe con - o * in <ul><li>
+    lines = escaped.split('\n')
+    in_list = False
+    new_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('- ') or stripped.startswith('* ') or stripped.startswith('+ '):
+            item_content = stripped[2:]
+            if not in_list:
+                new_lines.append('<ul class="report-list">')
+                in_list = True
+            new_lines.append(f'<li>{item_content}</li>')
+        else:
+            if in_list:
+                new_lines.append('</ul>')
+                in_list = False
+            new_lines.append(line)
+    if in_list:
+        new_lines.append('</ul>')
+    
+    escaped = '\n'.join(new_lines)
+    
+    # 5. Paragrafi ed a capo
+    paragraphs = escaped.split('\n\n')
+    formatted_paragraphs = []
+    for p in paragraphs:
+        p_stripped = p.strip()
+        if not p_stripped:
+            continue
+        # Se è un tag blocco già strutturato, non racchiuderlo in <p>
+        if p_stripped.startswith('<ul') or p_stripped.startswith('<pre') or p_stripped.startswith('</ul') or p_stripped.startswith('</pre'):
+            formatted_paragraphs.append(p_stripped)
+        else:
+            p_formatted = p_stripped.replace('\n', '<br>')
+            formatted_paragraphs.append(f'<p class="report-p">{p_formatted}</p>')
+            
+    return '\n'.join(formatted_paragraphs)
 
 
 # SIDEBAR - Configurazione dell'Analisi
@@ -375,7 +720,7 @@ if uploaded_file is not None:
             st.markdown(f'<div class="metric-card"><div class="metric-val">{total_lines:,}</div><div class="metric-label">Voci Totali</div></div>', unsafe_allow_html=True)
             
         with col2:
-            st.markdown(f'<div class="metric-card"><div class="metric-val" style="color: #ff4d4d;">{filtered_count:,}</div><div class="metric-label">Voci Filtrate</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="metric-val" style="color: #ff6e6e;">{filtered_count:,}</div><div class="metric-label">Voci Filtrate</div></div>', unsafe_allow_html=True)
             
         with col3:
             st.markdown(f'<div class="metric-card"><div class="metric-val">{percentage:.2f}%</div><div class="metric-label">Quota Filtrata</div></div>', unsafe_allow_html=True)
@@ -392,11 +737,11 @@ if uploaded_file is not None:
             
             if not severity_df.empty:
                 colors = {
-                    "CRITICAL": "#e056fd",
-                    "ERROR": "#ff4d4d",
-                    "WARNING": "#ff9f43",
-                    "INFO": "#1dd1a1",
-                    "DEBUG": "#54a0ff"
+                    "CRITICAL": "#ff5555",
+                    "ERROR": "#ff6e6e",
+                    "WARNING": "#ffb86c",
+                    "INFO": "#50fa7b",
+                    "DEBUG": "#8be9fd"
                 }
                 
                 fig = px.pie(
@@ -428,18 +773,18 @@ if uploaded_file is not None:
                 st.info("Nessuna severità rilevata nel file log.")
                 
         with details_col:
-            st.markdown("<h4 style='text-align: center; color: white;'>Conteggio Livelli</h4>", unsafe_allow_html=True)
-            html_table = "<div style='display: flex; flex-direction: column; gap: 5px; margin-top: 15px;'>"
+            st.markdown("<h4 style='text-align: center; color: white; font-family: \"Space Grotesk\", sans-serif; font-weight: 600;'>Conteggio Livelli</h4>", unsafe_allow_html=True)
+            html_table = "<div class='badge-row-container'>"
             badge_colors = {
-                "CRITICAL": "#e056fd",
-                "ERROR": "#ff4d4d",
-                "WARNING": "#ff9f43",
-                "INFO": "#1dd1a1",
-                "DEBUG": "#54a0ff"
+                "CRITICAL": "#ff5555",
+                "ERROR": "#ff6e6e",
+                "WARNING": "#ffb86c",
+                "INFO": "#50fa7b",
+                "DEBUG": "#8be9fd"
             }
             for sev, count in severity_counts.items():
-                col = badge_colors.get(sev, "#8892b0")
-                html_table += f"<div style='display: flex; justify-content: space-between; align-items: center; background-color: #1e222b; border: 1px solid #2d3139; border-radius: 6px; padding: 6px 12px;'><span style='color: {col}; font-weight: bold;'>● {sev}</span><span style='color: white; font-weight: 600;'>{count:,}</span></div>"
+                col = badge_colors.get(sev, "#94a3b8")
+                html_table += f"<div class='badge-row'><span style='color: {col}; font-weight: bold;'>● {sev}</span><span style='color: white; font-weight: 600;'>{count:,}</span></div>"
             html_table += "</div>"
             st.markdown(html_table, unsafe_allow_html=True)
             
@@ -477,7 +822,7 @@ if uploaded_file is not None:
                 # Visualizzazione dell'anteprima con box HTML colorato ad altezza fissa e scroll nativo
                 preview_text = "\n".join(logs_to_send)
                 colorized_preview = colorize_log(preview_text)
-                html_preview = f"<div style='margin-bottom: 5px; font-size: 0.9rem; color: #8892b0;'>Anteprima dei log selezionati per l'invio ({len(logs_to_send)} righe):</div><pre style='background-color: #1e222b; color: #ffffff; padding: 15px; border: 1px solid #2d3139; border-radius: 8px; height: 300px; overflow-y: auto; overflow-x: auto; font-family: \"JetBrains Mono\", monospace; font-size: 0.85rem; white-space: pre; line-height: 1.4;'>{colorized_preview}</pre>"
+                html_preview = f"<div style='margin-bottom: 8px; font-size: 0.9rem; color: #94a3b8;'>Anteprima dei log selezionati per l'invio ({len(logs_to_send)} righe):</div><div class='log-preview'>{colorized_preview}</div>"
                 st.markdown(html_preview, unsafe_allow_html=True)
                 
                 if len(filtered_texts) > max_lines:
@@ -510,9 +855,39 @@ if uploaded_file is not None:
             # Badge di avvertimento sul costo/scelta modello
             cost_warning_html = ""
             if model_option == "gemini-2.5-pro" and token_count > 5000:
-                cost_warning_html = f"<div style='font-size: 0.8rem; color: #ff9f43; margin-top: 8px;'>⚠️ <b>Suggerimento</b>: Con questa quantità di log, l'uso di <i>gemini-2.5-flash</i> costerebbe circa il 94% in meno (${((token_count / 1_000_000) * PRICING['gemini-2.5-flash']['input'] + (output_tokens_est / 1_000_000) * PRICING['gemini-2.5-flash']['output']):.5f} totali) pur mantenendo ottime performance.</div>"
+                cost_warning_html = f"<div class='cost-suggestion'>⚠️ <b>Suggerimento</b>: Con questa quantità di log, l'uso di <i>gemini-2.5-flash</i> costerebbe circa il 94% in meno (${((token_count / 1_000_000) * PRICING['gemini-2.5-flash']['input'] + (output_tokens_est / 1_000_000) * PRICING['gemini-2.5-flash']['output']):.5f} totali) pur mantenendo ottime performance.</div>"
                 
-            cost_card_html = f"<div style='background-color: #1e222b; border: 1px solid #2d3139; border-radius: 8px; padding: 15px; margin-bottom: 20px;'><div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'><span style='font-size: 1.2rem;'>💰</span><span style='font-weight: bold; color: white; font-size: 1rem;'>Analisi Stima dei Costi (API Gemini)</span></div><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;'><div><span style='color: #8892b0;'>Token Input Stimati:</span> <strong style='color: white;'>{token_count:,}</strong></div><div><span style='color: #8892b0;'>Costo Input (Prompt):</span> <strong style='color: #1dd1a1;'>${input_cost:.6f}</strong></div><div><span style='color: #8892b0;'>Token Output Stimati:</span> <strong style='color: white;'>~{output_tokens_est}</strong></div><div><span style='color: #8892b0;'>Costo Output (Report):</span> <strong style='color: #1dd1a1;'>${output_cost:.6f}</strong></div></div><hr style='border-color: #2d3139; margin: 10px 0;'><div style='display: flex; justify-content: space-between; align-items: center;'><span style='font-weight: bold; color: white; font-size: 0.95rem;'>Costo Totale Stimato:</span><strong style='color: #1dd1a1; font-size: 1.1rem;'>${total_cost:.6f}</strong></div>{cost_warning_html}</div>"
+            cost_card_html = f"""
+            <div class="cost-card">
+                <div class="cost-title">
+                    <span>💰</span>
+                    <span>Analisi Stima dei Costi (API Gemini)</span>
+                </div>
+                <div class="cost-grid">
+                    <div class="cost-item">
+                        <span class="cost-label">Token Input Stimati</span>
+                        <span class="cost-val">{token_count:,}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Costo Input (Prompt)</span>
+                        <span class="cost-val" style="color: #4ade80;">${input_cost:.6f}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Token Output Stimati</span>
+                        <span class="cost-val">~{output_tokens_est}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Costo Output (Report)</span>
+                        <span class="cost-val" style="color: #4ade80;">${output_cost:.6f}</span>
+                    </div>
+                </div>
+                <div class="cost-total-row">
+                    <span class="cost-total-label">Costo Totale Estimato</span>
+                    <span class="cost-total-val">${total_cost:.6f}</span>
+                </div>
+                {cost_warning_html}
+            </div>
+            """
             st.markdown(cost_card_html, unsafe_allow_html=True)
                 
             # Pulsante per avviare generazione del report
@@ -589,8 +964,8 @@ if uploaded_file is not None:
                     content = pt["data"].content
                     idx = pt["idx"]
                     
-                    st.markdown(f'<div class="report-card report-card-{idx}"><div class="report-title">{title}</div></div>', unsafe_allow_html=True)
-                    st.markdown(content)
+                    html_content = markdown_to_html(content)
+                    st.markdown(f'<div class="report-card report-card-{idx}"><div class="report-title">{title}</div><div class="report-content">{html_content}</div></div>', unsafe_allow_html=True)
                     
                 # Ricostruzione testo Markdown intero per il download
                 markdown_report = f"""# Report di Analisi dei Log
