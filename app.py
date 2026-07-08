@@ -803,10 +803,10 @@ col_left, col_center, col_right = st.columns([1, 2, 1])
 with col_center:
     if gemini_key:
         api_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 10px; filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.45));"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>'
-        api_title = "Chiave API Gemini Caricata Correttamente"
+        api_title = "Chiave API Caricata Correttamente"
     else:
         api_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 10px; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.45));"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>'
-        api_title = "Chiave API Gemini Mancante"
+        api_title = "Chiave API Mancante"
 
     st.markdown(
         f"""
@@ -816,7 +816,7 @@ with col_center:
                 <span style="cursor: help; display: inline-flex; align-items: center;" title="{api_title}">{api_icon}</span>
             </h1>
             <p class="subtitle" style="text-align: center; width: 100%; margin-left: auto; margin-right: auto; margin-top: 0px;">
-                Analizza i file di log di qualsiasi sistema o applicazione, filtra le anomalie e ottieni un report strutturato da Gemini AI.
+                Analizza i file di log di qualsiasi sistema o applicazione, filtra le anomalie e ottieni un report strutturato dall'AI.
             </p>
         </div>
         """, 
@@ -824,7 +824,7 @@ with col_center:
     )
 
     if not gemini_key:
-        st.error("❌ Chiave API mancante. Configura `GEMINI_API_KEY` nel file `.env` o tra le variabili d'ambiente per procedere.")
+        st.error("Chiave API mancante. Configura `GEMINI_API_KEY` nel file `.env` o tra le variabili d'ambiente per procedere.")
 
     uploaded_file = st.file_uploader(
         "Carica un file di log (.txt, .log)", 
@@ -893,7 +893,7 @@ if uploaded_file is not None:
             order_label = "ultime"
             
         # Creazione delle Tab segmentate per un layout SaaS moderno
-        tab1, tab2, tab3 = st.tabs(["📊 Dashboard & Statistiche", "👁️ Console Log", "✨ Analisi AI"])
+        tab1, tab2, tab3 = st.tabs(["Dashboard & Statistiche", "Console Log", "Analisi AI"])
         
         with tab1:
             # Layout Metriche Generali con custom SVGs
@@ -1009,8 +1009,16 @@ if uploaded_file is not None:
                 st.markdown(html_table, unsafe_allow_html=True)
                 
         with tab2:
-            st.markdown("<h3 style='margin-bottom: 0.5rem; font-family: \"Space Grotesk\", sans-serif; font-weight: 600;'>👁️ Console dei Log Filtrati</h3>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem;'>Filtra ed esamina le righe di log da inviare a Gemini AI.</p>", unsafe_allow_html=True)
+            st.markdown(
+                """
+                <h3 style='margin-bottom: 0.5rem; font-family: "Space Grotesk", sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px;'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <span>Console dei Log Filtrati</span>
+                </h3>
+                """, 
+                unsafe_allow_html=True
+            )
+            st.markdown("<p style='color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem;'>Filtra ed esamina le righe di log da inviare all'AI.</p>", unsafe_allow_html=True)
             
             # Pannello di controllo filtri log inseriti in una card orizzontale
             filter_container = st.container(border=True)
@@ -1036,7 +1044,7 @@ if uploaded_file is not None:
             if filtered_count > 0:
                 max_val = max(1, filtered_count)
                 st.slider(
-                    "Numero massimo di righe da inviare a Gemini", 
+                    "Numero massimo di righe da inviare", 
                     min_value=1, 
                     max_value=max_val, 
                     value=min(200, max_val),
@@ -1045,7 +1053,7 @@ if uploaded_file is not None:
                 )
                 
                 st.radio(
-                    "Quali righe inviare a Gemini?",
+                    "Quali righe inviare?",
                     options=["Ultime righe (Consigliato per catturare il crash finale)", "Prime righe"],
                     key="slice_order_radio",
                     horizontal=True
@@ -1077,17 +1085,25 @@ if uploaded_file is not None:
                 st.info("Nessuna riga trovata con i filtri attuali. Prova ad includere più livelli di severità o a modificare la ricerca.")
                 
         with tab3:
-            st.markdown("<h3 style='margin-bottom: 0.5rem; font-family: \"Space Grotesk\", sans-serif; font-weight: 600;'>✨ Analisi AI & Generazione Report</h3>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem;'>Seleziona il modello ed effettua l'analisi con Gemini AI.</p>", unsafe_allow_html=True)
+            st.markdown(
+                """
+                <h3 style='margin-bottom: 0.5rem; font-family: "Space Grotesk", sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px;'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.886L4.2 9l5.886 1.912L12 21l1.912-5.886L19.8 15l-5.886-1.912z"/></svg>
+                    <span>Analisi AI & Generazione Report</span>
+                </h3>
+                """, 
+                unsafe_allow_html=True
+            )
+            st.markdown("<p style='color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem;'>Seleziona il modello ed effettua l'analisi con l'AI.</p>", unsafe_allow_html=True)
             
             if len(logs_to_send) > 0:
                 # Selezione del modello
                 st.selectbox(
-                    "Modello Gemini per l'Analisi",
+                    "Modello per l'Analisi",
                     options=["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"],
                     index=0,
                     key="model_option_selectbox",
-                    help="Scegli gemini-2.5-flash per risposte veloci. Scegli gemini-2.5-pro per log estremamente complessi."
+                    help="Scegli il modello flash per risposte veloci o pro per log estremamente complessi."
                 )
                 
                 # Stima dei token
@@ -1108,13 +1124,13 @@ if uploaded_file is not None:
                 
                 cost_warning_html = ""
                 if model_option == "gemini-2.5-pro" and token_count > 5000:
-                    cost_warning_html = f"<div class='cost-suggestion'>⚠️ <b>Suggerimento</b>: Con questa quantità di log, l'uso di <i>gemini-2.5-flash</i> costerebbe circa il 94% in meno (${((token_count / 1_000_000) * PRICING['gemini-2.5-flash']['input'] + (output_tokens_est / 1_000_000) * PRICING['gemini-2.5-flash']['output']):.5f} totali) pur mantenendo ottime performance.</div>"
+                    cost_warning_html = f"<div class='cost-suggestion' style='display: flex; align-items: center; gap: 8px;'><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#fb923c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path><line x1='12' y1='9' x2='12' y2='13'></line><line x1='12' y1='17' x2='12.01' y2='17'></line></svg><span><b>Suggerimento</b>: Con questa quantità di log, l'uso di <i>gemini-2.5-flash</i> costerebbe circa il 94% in meno (${((token_count / 1_000_000) * PRICING['gemini-2.5-flash']['input'] + (output_tokens_est / 1_000_000) * PRICING['gemini-2.5-flash']['output']):.5f} totali) pur mantenendo ottime performance.</span></div>"
                     
                 cost_card_html = f"""
                 <div class="cost-card">
-                    <div class="cost-title">
-                        <span>💰</span>
-                        <span>Analisi Stima dei Costi (API Gemini)</span>
+                    <div class="cost-title" style="display: flex; align-items: center; gap: 10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <span>Analisi Stima dei Costi (API)</span>
                     </div>
                     <div class="cost-grid">
                         <div class="cost-item">
@@ -1144,10 +1160,10 @@ if uploaded_file is not None:
                 st.markdown(cost_card_html, unsafe_allow_html=True)
                 
                 if not gemini_key:
-                    st.error("Impossibile procedere: Chiave API Gemini non configurata. Imposta `GEMINI_API_KEY` nel file `.env` o nel sistema.")
+                    st.error("Impossibile procedere: Chiave API non configurata. Imposta `GEMINI_API_KEY` nel file `.env` o nel sistema.")
                 else:
-                    if st.button("🚀 Genera Report di Analisi con Gemini"):
-                        with st.spinner("Gemini sta elaborando i log di errore..."):
+                    if st.button("Genera Report di Analisi"):
+                        with st.spinner("L'AI sta elaborando i log di errore..."):
                             try:
                                 client = genai.Client(api_key=gemini_key)
                                 
@@ -1188,10 +1204,10 @@ if uploaded_file is not None:
                                     report_obj = LogAnalysisReport(**data)
                                     
                                 st.session_state["report"] = report_obj
-                                st.success("✨ Report generato con successo!")
+                                st.success("Report generato con successo!")
                                 
                             except APIError as api_err:
-                                st.error(f"Errore dell'API di Gemini: {api_err.message}")
+                                st.error(f"Errore dell'API del servizio AI: {api_err.message}")
                             except Exception as e:
                                 st.error(f"Si è verificato un errore inaspettato: {e}")
                                 
@@ -1199,7 +1215,15 @@ if uploaded_file is not None:
                 if st.session_state.get("report") is not None:
                     report_obj = st.session_state["report"]
                     
-                    st.markdown("### 📊 Report di Analisi Gemini")
+                    st.markdown(
+                        """
+                        <h3 style='margin-top: 2rem; margin-bottom: 1rem; font-family: "Space Grotesk", sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px;'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Report di Analisi AI
+                        </h3>
+                        """, 
+                        unsafe_allow_html=True
+                    )
                     
                     points = [
                         {"data": report_obj.problem_summary, "idx": 1},
@@ -1228,7 +1252,7 @@ if uploaded_file is not None:
 """
                     
                     st.download_button(
-                        label="💾 Scarica Report in Markdown",
+                        label="Scarica Report in Markdown",
                         data=markdown_report,
                         file_name="ai_log_analysis_report.md",
                         mime="text/markdown"
@@ -1238,14 +1262,14 @@ if uploaded_file is not None:
                 
 else:
     with col_center:
-        st.info("👋 Benvenuto! Carica un file di log (.txt o .log) per iniziare ad analizzarlo.")
+        st.info("Benvenuto! Carica un file di log (.txt o .log) per iniziare ad analizzarlo.")
         
-        with st.expander("ℹ️ Come funziona?"):
+        with st.expander("Come funziona?"):
             st.write("""
             1. **Carica il tuo log**: Trascina un file di testo contenente i log della tua applicazione.
             2. **Filtro automatico**: L'applicazione isolerà le righe contenenti errori (es: `ERROR`, `Exception`, `Traceback`).
-            3. **Analisi Intelligente**: Clicca su 'Genera Report' per inviare i log filtrati all'API di Gemini.
-            4. **Report in 3 Punti**: Gemini produrrà un report in italiano strutturato in:
+            3. **Analisi Intelligente**: Clicca su 'Genera Report' per inviare i log filtrati all'API dell'AI.
+            4. **Report in 3 Punti**: L'AI produrrà un report in italiano strutturato in:
                - **Sintesi delle Problematiche**: Panoramica delle anomalie e degli eventi riscontrati.
                - **Analisi delle Cause Principali**: Spiegazione tecnica dettagliata delle possibili cause (Root Cause Analysis).
                - **Raccomandazioni e Soluzioni**: Suggerimenti operativi e passi risolutivi di fix.
