@@ -1,0 +1,185 @@
+"""
+Parsing, filtraggio, deduplicazione e troncamento delle righe di log.
+
+Tutte le funzioni qui sono pure (input -> output, nessuno stato globale,
+nessuna chiamata di rete) e sono coperte da test in tests/test_log_parser.py.
+Se devi modificare come i log vengono interpretati o preparati per l'invio
+all'AI, questo è l'unico file che ti serve leggere.
+"""
+import re
+
+from config import MAX_ENTRY_CHARS
+
+_SEVERITY_PATTERNS = {
+    "CRITICAL": re.compile(r"\b(CRITICAL|FATAL|SEVERE)\b", re.IGNORECASE),
+    "ERROR": re.compile(r"\b(ERROR|EXCEPTION|FAIL|FAILED)\b", re.IGNORECASE),
+    "WARNING": re.compile(r"\b(WARNING|WARN)\b", re.IGNORECASE),
+    "INFO": re.compile(r"\b(INFO)\b", re.IGNORECASE),
+    "DEBUG": re.compile(r"\b(DEBUG)\b", re.IGNORECASE),
+}
+
+# Timestamp tipo "2026-06-25 16:02:22" o "2026-06-25T16:02:22.123" ad inizio riga,
+# usato per normalizzare le righe prima del confronto in dedupe_entries().
+_LEADING_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?\s*")
+
+
+def detect_severity(text: str) -> str:
+    """Determina la severità di un blocco di testo (riga singola o traceback)."""
+    if "traceback (most recent call last)" in text.lower() or "traceback (" in text:
+        return "ERROR"
+    for level, pattern in _SEVERITY_PATTERNS.items():
+        if pattern.search(text):
+            return level
+    return "INFO"
+
+
+def parse_log_to_entries(log_content: str) -> list[dict]:
+    """
+    Parsa l'intero log riga per riga, raggruppando le stack trace Traceback
+    in elementi logici multi-riga. Rileva il livello di severità di ciascun
+    elemento.
+
+    Ritorna una lista di dict: {"text": str, "severity": str, "is_traceback": bool}
+    """
+    lines = log_content.splitlines()
+    entries: list[dict] = []
+
+    in_traceback = False
+    traceback_buffer: list[str] = []
+
+    for line in lines:
+        is_traceback_start = (
+            "traceback (most recent call last)" in line.lower()
+            or line.strip().startswith("Traceback (")
+            or (
+                line.strip().startswith("at ")
+                and len(entries) > 0
+                and entries[-1]["severity"] == "ERROR"
+            )
+        )
+
+        if is_traceback_start:
+            in_traceback = True
+            traceback_buffer = [line]
+            continue
+
+        if in_traceback:
+            if line.startswith(" ") or line.startswith("\t") or not line.strip():
+                traceback_buffer.append(line)
+            else:
+                traceback_buffer.append(line)
+                text = "\n".join(traceback_buffer)
+                entries.append(
+                    {"text": text, "severity": detect_severity(text), "is_traceback": True}
+                )
+                in_traceback = False
+                traceback_buffer = []
+            continue
+
+        if line.strip():
+            entries.append(
+                {"text": line, "severity": detect_severity(line), "is_traceback": False}
+            )
+
+    if in_traceback and traceback_buffer:
+        text = "\n".join(traceback_buffer)
+        entries.append({"text": text, "severity": detect_severity(text), "is_traceback": True})
+
+    return entries
+
+
+def filter_entries(entries: list[dict], selected_severities: list[str], search_query: str) -> list[dict]:
+    """Filtra le entry per severità e per testo/regex di ricerca."""
+    filtered = []
+    search_pattern = None
+    if search_query.strip():
+        try:
+            search_pattern = re.compile(search_query, re.IGNORECASE)
+        except re.error:
+            search_pattern = None
+
+    for entry in entries:
+        if entry["severity"] not in selected_severities:
+            continue
+
+        if search_query.strip():
+            if search_pattern:
+                if not search_pattern.search(entry["text"]):
+                    continue
+            else:
+                if search_query.lower() not in entry["text"].lower():
+                    continue
+
+        filtered.append(entry)
+
+    return filtered
+
+
+def dedupe_entries(entries: list[dict]) -> list[dict]:
+    """
+    Comprime righe consecutive identiche (a meno del timestamp) in una sola
+    entry con contatore, per ridurre i token inviati all'AI su log ripetitivi
+    (es. health-check falliti ogni secondo, stesso stack trace ripetuto N volte).
+
+    Non tocca le entry di traceback multi-riga: vengono confrontate per
+    uguaglianza esatta del testo dopo la rimozione del solo timestamp iniziale
+    dell'eventuale prima riga.
+    """
+    if not entries:
+        return []
+
+    def normalize(text: str) -> str:
+        return _LEADING_TIMESTAMP.sub("", text, count=1).strip()
+
+    deduped: list[dict] = []
+    prev_norm = None
+
+    for entry in entries:
+        norm = normalize(entry["text"])
+        if deduped and norm == prev_norm:
+            last = deduped[-1]
+            last["count"] = last.get("count", 1) + 1
+        else:
+            new_entry = dict(entry)
+            new_entry["count"] = 1
+            deduped.append(new_entry)
+            prev_norm = norm
+
+    # Applica il suffisso "(xN)" solo dove serve, per non sporcare il testo
+    # delle entry non ripetute
+    for entry in deduped:
+        if entry["count"] > 1:
+            entry["text"] = f"{entry['text']}  [ripetuta x{entry['count']}]"
+
+    return deduped
+
+
+def truncate_entry_text(text: str, max_chars: int = MAX_ENTRY_CHARS) -> str:
+    """
+    Tronca il testo di una entry troppo lunga (tipicamente una traceback enorme)
+    mantenendo testa e coda, che di solito contengono l'informazione più utile
+    (tipo eccezione all'inizio, punto di fallimento reale in fondo).
+    """
+    if len(text) <= max_chars:
+        return text
+
+    head_chars = max_chars // 2
+    tail_chars = max_chars - head_chars
+    omitted = len(text) - max_chars
+    return (
+        f"{text[:head_chars]}\n"
+        f"... [{omitted} caratteri troncati per ottimizzare i token] ...\n"
+        f"{text[-tail_chars:]}"
+    )
+
+
+def prepare_entries_for_send(
+    entries: list[dict], dedupe: bool = True, max_entry_chars: int = MAX_ENTRY_CHARS
+) -> list[str]:
+    """
+    Pipeline completa di preparazione delle entry prima dell'invio all'AI:
+    dedupe opzionale + troncamento per-entry. Ritorna la lista di testi pronti
+    da unire con "\\n" nel payload finale.
+    """
+    working = dedupe_entries(entries) if dedupe else entries
+    return [truncate_entry_text(e["text"], max_entry_chars) for e in working]

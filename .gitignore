@@ -152,5 +152,13 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Streamlit config
-.streamlit/
+# Backend (FastAPI) local DB
+*.db
+*.db-journal
+backend/*.db
+
+# Frontend (React/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
