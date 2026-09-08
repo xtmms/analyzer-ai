@@ -1,0 +1,10 @@
+[2026-09-08T08:15:22.102Z] INFO: Starting node.js server on port 3000
+[2026-09-08T08:15:23.001Z] INFO: Connected to Redis cache
+[2026-09-08T08:16:10.550Z] WARN: Memory usage high: 85%
+[2026-09-08T08:17:42.112Z] CRITICAL: Unhandled exception in worker thread
+TypeError: Cannot read properties of undefined (reading 'config')
+    at Worker.processJob (/opt/app/worker.js:55:23)
+    at Timeout._onTimeout (/opt/app/scheduler.js:102:12)
+    at listOnTimeout (node:internal/timers:559:17)
+    at processTimers (node:internal/timers:502:7)
+[2026-09-08T08:17:42.115Z] FATAL: Server crashed. Initiating restart sequence.

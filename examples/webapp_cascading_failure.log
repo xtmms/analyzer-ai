@@ -1,0 +1,48 @@
+2026-09-08 10:15:01,234 [INFO ] [main] - Application startup complete. Listening on port 8080.
+2026-09-08 10:15:02,112 [INFO ] [worker-1] - Database connection pool initialized (min=5, max=20)
+2026-09-08 10:15:05,441 [INFO ] [worker-2] - Received GET /api/v1/health - Status 200 OK
+2026-09-08 10:16:12,001 [INFO ] [worker-1] - User 'tommaso' successfully authenticated.
+2026-09-08 10:16:15,302 [INFO ] [worker-3] - Received GET /api/v1/dashboard - Status 200 OK
+2026-09-08 10:18:22,881 [INFO ] [worker-4] - Processing payment for transaction tx_987654321
+2026-09-08 10:18:24,105 [INFO ] [worker-4] - Payment processed successfully.
+2026-09-08 10:25:00,000 [INFO ] [cron-job] - Starting scheduled task: generate_monthly_reports
+2026-09-08 10:25:01,452 [INFO ] [cron-job] - Querying database for historical data (last 5 years)...
+2026-09-08 10:25:35,112 [WARN ] [worker-2] - Request GET /api/v1/users took 4500ms (threshold: 2000ms)
+2026-09-08 10:26:01,999 [WARN ] [worker-5] - Connection pool usage high: 18/20 active connections
+2026-09-08 10:26:15,021 [WARN ] [worker-6] - Request POST /api/v1/checkout took 8200ms
+2026-09-08 10:26:30,001 [ERROR] [worker-7] - Failed to acquire database connection from pool within 10000ms
+Traceback (most recent call last):
+  File "/app/database/connection.py", line 85, in get_connection
+    conn = self.pool.acquire(timeout=10)
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/pool.py", line 749, in acquire
+    raise asyncio.TimeoutError("Timeout waiting for a connection")
+asyncio.exceptions.TimeoutError: Timeout waiting for a connection
+
+2026-09-08 10:26:30,005 [ERROR] [worker-7] - 500 Internal Server Error: GET /api/v1/inventory
+2026-09-08 10:26:31,102 [ERROR] [worker-8] - Failed to acquire database connection from pool within 10000ms
+Traceback (most recent call last):
+  File "/app/database/connection.py", line 85, in get_connection
+    conn = self.pool.acquire(timeout=10)
+  File "/usr/local/lib/python3.11/site-packages/asyncpg/pool.py", line 749, in acquire
+    raise asyncio.TimeoutError("Timeout waiting for a connection")
+asyncio.exceptions.TimeoutError: Timeout waiting for a connection
+
+2026-09-08 10:26:35,500 [CRITICAL] [cron-job] - Memory usage exceeded 90% (RSS: 3.8GB). Initiating garbage collection.
+2026-09-08 10:26:40,111 [WARN ] [health-check] - Liveness probe failed. Endpoint /api/v1/health did not respond within 5s.
+2026-09-08 10:26:45,000 [ERROR] [worker-1] - Redis Cache Connection Lost. 
+redis.exceptions.ConnectionError: Error 111 connecting to redis:6379. Connection refused.
+2026-09-08 10:26:48,222 [ERROR] [worker-3] - Failed to write session data. Fallback to DB.
+2026-09-08 10:26:50,112 [WARN ] [health-check] - Liveness probe failed (2/3). Endpoint /api/v1/health did not respond.
+2026-09-08 10:27:01,888 [CRITICAL] [cron-job] - Memory allocation failed. OutOfMemoryError.
+Traceback (most recent call last):
+  File "/app/tasks/reports.py", line 124, in generate_monthly_reports
+    data_frame = pd.concat([chunk for chunk in raw_data])
+  File "/usr/local/lib/python3.11/site-packages/pandas/core/reshape/concat.py", line 393, in concat
+    return op.get_result()
+MemoryError: Unable to allocate 4.2 GiB for an array with shape (15000000, 35) and data type float64
+
+2026-09-08 10:27:05,002 [FATAL] [main] - Unhandled exception in background task. System compromised.
+2026-09-08 10:27:10,000 [WARN ] [health-check] - Liveness probe failed (3/3). Kubernetes is restarting the pod.
+2026-09-08 10:27:10,015 [INFO ] [main] - Received SIGTERM signal. Shutting down gracefully...
+2026-09-08 10:27:11,500 [INFO ] [main] - Closing database connections...
+2026-09-08 10:27:40,015 [ERROR] [main] - Graceful shutdown timed out after 30s. Force killing process.

@@ -1,0 +1,13 @@
+2026-09-08 14:00:10 INFO  [main] Application started successfully.
+2026-09-08 14:01:22 INFO  [auth] User 'admin' logged in from 192.168.1.100.
+2026-09-08 14:05:33 DEBUG [db] Executing query: SELECT * FROM users WHERE id=1
+2026-09-08 14:06:45 WARNING [api] Rate limit approaching for IP 192.168.1.100 (90/100)
+2026-09-08 14:10:02 ERROR [db] Connection timeout after 30000ms
+Traceback (most recent call last):
+  File "app/database.py", line 42, in connect
+    self.pool.get_connection(timeout=30)
+  File "lib/pool.py", line 128, in get_connection
+    raise TimeoutError("Connection pool exhausted")
+TimeoutError: Connection pool exhausted
+2026-09-08 14:10:05 ERROR [api] Failed to process request /api/v1/data: Database unavailable
+2026-09-08 14:11:00 INFO  [auth] User 'admin' logged out.
