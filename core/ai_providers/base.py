@@ -7,6 +7,6 @@ class AIProvider(ABC):
         self.api_key = api_key
 
     @abstractmethod
-    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str) -> Tuple[LogAnalysisReport, Dict[str, Any]]:
+    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str, hint: str = None) -> Tuple[LogAnalysisReport, Dict[str, Any]]:
         """Invia i log al provider e ritorna (LogAnalysisReport, UsageMetadata)."""
         raise NotImplementedError

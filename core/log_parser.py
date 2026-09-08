@@ -8,7 +8,7 @@ all'AI, questo è l'unico file che ti serve leggere.
 """
 import re
 
-from config import MAX_ENTRY_CHARS
+from config import MAX_ENTRY_CHARS, DEFAULT_MAX_LINES
 
 _SEVERITY_PATTERNS = {
     "CRITICAL": re.compile(r"\b(CRITICAL|FATAL|SEVERE)\b", re.IGNORECASE),
@@ -21,6 +21,19 @@ _SEVERITY_PATTERNS = {
 # Timestamp tipo "2026-06-25 16:02:22" o "2026-06-25T16:02:22.123" ad inizio riga,
 # usato per normalizzare le righe prima del confronto in dedupe_entries().
 _LEADING_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?\s*")
+
+
+def mask_pii_and_secrets(text: str) -> str:
+    """Oscura dati sensibili (PII e segreti) tramite Regex."""
+    # IPv4
+    text = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b").sub("[IPV4_MASKED]", text)
+    # Email
+    text = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b").sub("[EMAIL_MASKED]", text)
+    # UUIDs
+    text = re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b").sub("[UUID_MASKED]", text)
+    # Basic Bearer / JWT token (eyJ...)
+    text = re.compile(r"\b(Bearer\s+)?eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\b").sub("Bearer [JWT_MASKED]", text)
+    return text
 
 
 def detect_severity(text: str) -> str:
@@ -173,13 +186,63 @@ def truncate_entry_text(text: str, max_chars: int = MAX_ENTRY_CHARS) -> str:
     )
 
 
+def smart_truncate_entries(entries: list[dict], max_lines: int = DEFAULT_MAX_LINES) -> list[dict]:
+    """
+    Seleziona i chunk più importanti se il log supera max_lines.
+    Dà priorità a righe con ERROR, CRITICAL o is_traceback=True,
+    e preleva contesto circostante.
+    """
+    if len(entries) <= max_lines:
+        return entries
+    
+    error_indices = [i for i, e in enumerate(entries) if e["severity"] in ("ERROR", "CRITICAL") or e["is_traceback"]]
+    
+    if not error_indices:
+        return entries[-max_lines:]
+        
+    selected_indices = set()
+    lines_per_error = max(10, max_lines // len(error_indices))
+    
+    for idx in error_indices:
+        start = max(0, idx - (lines_per_error // 2))
+        end = min(len(entries), idx + (lines_per_error // 2) + 1)
+        for i in range(start, end):
+            selected_indices.add(i)
+            
+    current_idx = len(entries) - 1
+    while len(selected_indices) < max_lines and current_idx >= 0:
+        selected_indices.add(current_idx)
+        current_idx -= 1
+        
+    sorted_indices = sorted(list(selected_indices))[:max_lines]
+    
+    result = []
+    prev_i = -1
+    for i in sorted_indices:
+        if prev_i != -1 and i > prev_i + 1:
+            result.append({"text": "\n... [SNIP] ...\n", "severity": "INFO", "is_traceback": False})
+        result.append(entries[i])
+        prev_i = i
+        
+    return result
+
+
 def prepare_entries_for_send(
     entries: list[dict], dedupe: bool = True, max_entry_chars: int = MAX_ENTRY_CHARS
 ) -> list[str]:
     """
     Pipeline completa di preparazione delle entry prima dell'invio all'AI:
-    dedupe opzionale + troncamento per-entry. Ritorna la lista di testi pronti
-    da unire con "\\n" nel payload finale.
+    smart truncation + dedupe opzionale + troncamento per-entry + masking PII.
+    Ritorna la lista di testi pronti da unire con "\\n" nel payload finale.
     """
-    working = dedupe_entries(entries) if dedupe else entries
-    return [truncate_entry_text(e["text"], max_entry_chars) for e in working]
+    working = smart_truncate_entries(entries)
+    if dedupe:
+        working = dedupe_entries(working)
+    
+    final_texts = []
+    for e in working:
+        text = truncate_entry_text(e["text"], max_entry_chars)
+        text = mask_pii_and_secrets(text)
+        final_texts.append(text)
+        
+    return final_texts

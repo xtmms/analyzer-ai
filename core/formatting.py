@@ -22,20 +22,28 @@ def build_markdown_report(report: LogAnalysisReport) -> str:
         
     return md_content
 
-def save_report_to_output(report: LogAnalysisReport, original_filename: str) -> str:
-    """Salva il report nella cartella output/ e ritorna il percorso del file creato."""
-    if not os.path.exists("output"):
-        os.makedirs("output")
+def save_report_to_output(report: LogAnalysisReport, run_folder: str) -> str:
+    """Salva il report nella cartella specificata e ritorna il percorso del file creato."""
+    if not os.path.exists(run_folder):
+        os.makedirs(run_folder)
         
-    base_name = os.path.basename(original_filename)
-    name_without_ext = os.path.splitext(base_name)[0]
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    
-    out_filename = f"output/analysis_{name_without_ext}_{timestamp}.md"
+    out_filename = os.path.join(run_folder, "report.md")
     
     md_content = build_markdown_report(report)
     
     with open(out_filename, "w", encoding="utf-8") as f:
         f.write(md_content)
+        
+    return out_filename
+
+def save_masked_log_to_output(payload: str, run_folder: str) -> str:
+    """Salva il log mascherato nella cartella specificata per motivi di audit."""
+    if not os.path.exists(run_folder):
+        os.makedirs(run_folder)
+        
+    out_filename = os.path.join(run_folder, "masked_input.log")
+    
+    with open(out_filename, "w", encoding="utf-8") as f:
+        f.write(payload)
         
     return out_filename

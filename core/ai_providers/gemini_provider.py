@@ -11,7 +11,7 @@ class GeminiProvider(AIProvider):
     def _client(self) -> "genai.Client":
         return genai.Client(api_key=self.api_key)
 
-    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str) -> Tuple[LogAnalysisReport, Dict[str, Any]]:
+    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str, hint: str = None) -> Tuple[LogAnalysisReport, Dict[str, Any]]:
         client = self._client()
         
         chat = client.chats.create(
@@ -29,7 +29,7 @@ class GeminiProvider(AIProvider):
         
         for attempt in range(max_retries):
             try:
-                response = chat.send_message(build_user_prompt(logs_payload))
+                response = chat.send_message(build_user_prompt(logs_payload, hint))
                 break
             except Exception as e:
                 err_str = str(e).upper()

@@ -34,9 +34,13 @@ def get_system_instruction(detail_level: str = "Dettagliato") -> str:
         )
     return base
 
-def build_user_prompt(logs_payload: str) -> str:
-    return (
+def build_user_prompt(logs_payload: str, hint: str = None) -> str:
+    prompt = (
         "Ecco le righe di log di errore da analizzare:\n\n"
         f"```log\n{logs_payload}\n```\n\n"
-        "Genera il report strutturato in base a queste informazioni."
     )
+    if hint:
+        prompt += f"L'operatore fornisce questo contesto aggiuntivo per aiutarti nell'analisi:\n{hint}\n\n"
+        
+    prompt += "Genera il report strutturato in base a queste informazioni."
+    return prompt
