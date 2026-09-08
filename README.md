@@ -1,12 +1,12 @@
-# Analyzer AI CLI
+# Test Automation AI Analyzer CLI
 
-Strumento da riga di comando "One-Shot" per l'analisi intelligente e automatizzata dei file di log.
-Utilizza modelli LLM per analizzare log complessi o stack trace estese, fornendo una "Root Cause Analysis" dettagliata e sintesi dei problemi in markdown.
+Strumento da riga di comando "One-Shot" per l'analisi intelligente e automatizzata dei fallimenti dei test (Test Automation).
+Utilizza modelli LLM per analizzare report strutturati (JUnit XML, JSON) o log testuali grezzi, fornendo un report dettagliato per il QA che include test falliti, root cause analysis, flakiness assessment e raccomandazioni precise per il fix.
 
 ## Funzionalità Principali (Enterprise Ready)
-- **Data Masking Automatico**: Oscura automaticamente dati sensibili (PII) come indirizzi IPv4, email, UUID e token JWT (Bearer) prima dell'invio ai provider AI per garantire sicurezza e privacy.
-- **Smart Truncation**: Ottimizza il consumo di token su log di grandi dimensioni dando priorità a eccezioni e stack trace, tagliando le righe non utili per il debug.
-- **Supporto Pipeline (Stdin)**: Accetta log direttamente da `stdin` (`cat`, `kubectl`, `tail`), ideale per CI/CD o concatenazione bash.
+- **Smart Parsing (XML & JSON)**: Rileva automaticamente i file XML (JUnit) e JSON (es. Cypress, Playwright) estraendo unicamente gli stack trace dei test falliti per eliminare il rumore e risparmiare token.
+- **Data Masking Automatico**: Oscura automaticamente dati sensibili (PII) come indirizzi IPv4, email, UUID e token JWT (Bearer) prima dell'invio ai provider AI.
+- **Supporto Pipeline (Stdin)**: Accetta log crudi direttamente da `stdin` (es. l'output di un test runner in locale o in CI), scalando dinamicamente il parsing riga per riga se il formato non è strutturato.
 - **Audit Logging**: Conserva il payload esatto "mascherato" generato per ogni esecuzione.
 
 ## Requisiti
@@ -30,11 +30,11 @@ python main.py
 Puoi passare gli argomenti direttamente per by-passare il prompt interattivo, oppure fare pipe dell'output:
 
 ```bash
-# Esecuzione standard con file
-python main.py --file logs/app.log --provider gemini --model gemini-3.6-flash --detail Dettagliato
+# Esecuzione standard con report XML (es. JUnit)
+python main.py --file reports/junit.xml --provider gemini --model gemini-3.6-flash --detail Dettagliato
 
-# Esecuzione tramite Stdin con Hint e Print a schermo
-cat logs/app.log | python main.py --hint "Riavviato il pod database" --print
+# Esecuzione tramite Stdin per log testuali
+pytest --tb=short | python main.py --hint "Analizza i test E2E falliti." --print
 ```
 
 ### Parametri aggiuntivi
@@ -42,8 +42,7 @@ cat logs/app.log | python main.py --hint "Riavviato il pod database" --print
 - `--print`: Esegue il rendering formattato in Markdown a colori direttamente nella console al termine dell'analisi.
 
 ## Output Raggruppato
-Il risultato dell'analisi verrà generato in una sottocartella dedicata sotto la cartella `output/` (es. `output/run_20260908_184500_app_log/`).
+Il risultato dell'analisi verrà generato in una sottocartella dedicata sotto la cartella `output/` (es. `output/run_20260908_184500_junit_xml/`).
 All'interno troverai:
-- `report.md`: L'analisi dettagliata (sintesi, root cause, raccomandazioni).
-- `masked_input.log`: Il file inviato all'LLM, privo dei tuoi dati sensibili, per motivi di audit.
-
+- `report.md`: L'analisi AI per il QA (test falliti, root cause, flakiness, raccomandazioni).
+- `masked_input.log`: I test falliti inviati all'LLM, privi dei tuoi dati sensibili, per motivi di audit.

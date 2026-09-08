@@ -4,14 +4,14 @@ from google import genai
 from google.genai import types
 
 from core.ai_providers.base import AIProvider
-from core.report_schema import get_system_instruction, LogAnalysisReport, build_user_prompt
+from core.report_schema import get_system_instruction, TestAutomationReport, build_user_prompt
 
 
 class GeminiProvider(AIProvider):
     def _client(self) -> "genai.Client":
         return genai.Client(api_key=self.api_key)
 
-    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str, hint: str = None) -> Tuple[LogAnalysisReport, Dict[str, Any]]:
+    def analyze(self, model: str, logs_payload: str, temperature: float, detail_level: str, hint: str = None) -> Tuple[TestAutomationReport, Dict[str, Any]]:
         client = self._client()
         
         chat = client.chats.create(
@@ -20,7 +20,7 @@ class GeminiProvider(AIProvider):
                 system_instruction=get_system_instruction(detail_level),
                 temperature=temperature,
                 response_mime_type="application/json",
-                response_schema=LogAnalysisReport,
+                response_schema=TestAutomationReport,
             )
         )
         
@@ -41,10 +41,10 @@ class GeminiProvider(AIProvider):
                 raise  # Se non è un errore temporaneo o i tentativi sono finiti, rilancia l'eccezione
 
         report_obj = response.parsed
-        if not isinstance(report_obj, LogAnalysisReport):
+        if not isinstance(report_obj, TestAutomationReport):
             import json
             data = json.loads(response.text)
-            report_obj = LogAnalysisReport(**data)
+            report_obj = TestAutomationReport(**data)
             
         usage = {
             "input_tokens": response.usage_metadata.prompt_token_count if response.usage_metadata else 0,

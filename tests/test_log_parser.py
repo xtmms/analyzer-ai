@@ -111,3 +111,44 @@ def test_prepare_entries_for_send_pipeline():
 
     result_no_dedupe = prepare_entries_for_send(entries, dedupe=False)
     assert len(result_no_dedupe) == 2
+
+def test_parse_junit_xml():
+    xml_data = """<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="pytest">
+    <testcase classname="test_foo" name="test_bar">
+      <failure message="AssertionError: assert False">
+        Traceback (most recent call last):
+          File "test_foo.py", line 4, in test_bar
+            assert False
+      </failure>
+    </testcase>
+  </testsuite>
+</testsuites>"""
+    entries = parse_log_to_entries(xml_data)
+    assert len(entries) == 1
+    assert "test_foo.test_bar" in entries[0]["text"]
+    assert entries[0]["severity"] == "ERROR"
+    assert entries[0]["is_traceback"] is True
+
+def test_parse_test_json():
+    json_data = """
+    {
+      "tests": [
+        {
+          "title": "should fail",
+          "status": "failed",
+          "err": {
+            "message": "Timed out retrying",
+            "stack": "Error: Timed out retrying at Context.eval"
+          }
+        }
+      ]
+    }
+    """
+    entries = parse_log_to_entries(json_data)
+    assert len(entries) == 1
+    assert "should fail" in entries[0]["text"]
+    assert "Timed out retrying" in entries[0]["text"]
+    assert entries[0]["severity"] == "ERROR"
+    assert entries[0]["is_traceback"] is True

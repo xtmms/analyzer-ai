@@ -17,8 +17,8 @@ console = Console()
 def main():
     load_dotenv()
     
-    parser = argparse.ArgumentParser(description="Log Analyzer CLI")
-    parser.add_argument("--file", help="Percorso del file di log da analizzare")
+    parser = argparse.ArgumentParser(description="Test Automation Failure Analyzer CLI")
+    parser.add_argument("--file", help="Percorso del file di log o report XML/JSON da analizzare")
     parser.add_argument("--provider", choices=list(AI_PROVIDERS.keys()), help="Provider AI da utilizzare")
     parser.add_argument("--model", help="Modello AI da utilizzare")
     parser.add_argument("--detail", choices=["Sintetico", "Dettagliato"], help="Livello di dettaglio del report")
@@ -36,10 +36,10 @@ def main():
 
     if is_interactive:
         print_to_console = True  # Default in interactive mode
-        console.print(Panel.fit("[bold blue]Log Analyzer AI CLI[/bold blue]", subtitle="Interactive Mode"))
+        console.print(Panel.fit("[bold blue]Test Automation AI Analyzer[/bold blue]", subtitle="Interactive Mode"))
         console.print()
         
-        file_path = questionary.path("Seleziona il file di log da analizzare:").ask()
+        file_path = questionary.path("Seleziona il log o report XML/JSON dei test:").ask()
         if not file_path or not os.path.exists(file_path):
             console.print("[bold red]Errore:[/bold red] File non valido o inesistente.")
             sys.exit(1)
@@ -101,7 +101,7 @@ def main():
         console.print(f"Contesto: [italic]{hint}[/italic]")
     console.print()
 
-    with console.status("[bold cyan]Lettura e parsing del file di log...[/bold cyan]"):
+    with console.status("[bold cyan]Lettura e parsing dei risultati di test...[/bold cyan]"):
         try:
             if has_stdin:
                 log_content = sys.stdin.read()

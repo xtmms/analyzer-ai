@@ -46,14 +46,83 @@ def detect_severity(text: str) -> str:
     return "INFO"
 
 
+def parse_junit_xml(xml_content: str) -> list[dict]:
+    import xml.etree.ElementTree as ET
+    entries = []
+    try:
+        root = ET.fromstring(xml_content)
+        for testcase in root.iter('testcase'):
+            name = testcase.get('name', 'Unknown test')
+            classname = testcase.get('classname', '')
+            full_name = f"{classname}.{name}" if classname else name
+            
+            for child in testcase:
+                if child.tag in ('failure', 'error'):
+                    message = child.get('message', '')
+                    stack_trace = child.text or ''
+                    
+                    text = f"TEST FAILED: {full_name}\nMESSAGE: {message}\nTRACEBACK:\n{stack_trace.strip()}"
+                    entries.append({
+                        "text": text,
+                        "severity": "ERROR",
+                        "is_traceback": True
+                    })
+    except ET.ParseError:
+        pass
+    return entries
+
+
+def extract_json_failures(data) -> list[dict]:
+    entries = []
+    if isinstance(data, dict):
+        if data.get("status") in ("failed", "fail") or data.get("state") == "failed" or data.get("outcome") == "failed":
+            name = data.get("name") or data.get("title", "Unknown test")
+            err = data.get("err") or data.get("error") or {}
+            message = err.get("message") if isinstance(err, dict) else str(err)
+            stack = err.get("stack") if isinstance(err, dict) else ""
+            
+            text = f"TEST FAILED: {name}\nMESSAGE: {message}\nTRACEBACK:\n{stack}"
+            entries.append({
+                "text": text,
+                "severity": "ERROR",
+                "is_traceback": True
+            })
+        for v in data.values():
+            entries.extend(extract_json_failures(v))
+    elif isinstance(data, list):
+        for item in data:
+            entries.extend(extract_json_failures(item))
+    return entries
+
+
 def parse_log_to_entries(log_content: str) -> list[dict]:
     """
     Parsa l'intero log riga per riga, raggruppando le stack trace Traceback
     in elementi logici multi-riga. Rileva il livello di severità di ciascun
-    elemento.
+    elemento. Tenta prima il parsing di JSON (test report) e XML (JUnit).
 
     Ritorna una lista di dict: {"text": str, "severity": str, "is_traceback": bool}
     """
+    log_content_stripped = log_content.strip()
+    
+    # Auto-routing JSON
+    if log_content_stripped.startswith('{') or log_content_stripped.startswith('['):
+        import json
+        try:
+            data = json.loads(log_content_stripped)
+            entries = extract_json_failures(data)
+            if entries:
+                return entries
+        except json.JSONDecodeError:
+            pass
+
+    # Auto-routing XML
+    if log_content_stripped.startswith('<?xml') or log_content_stripped.startswith('<testsuite'):
+        entries = parse_junit_xml(log_content_stripped)
+        if entries:
+            return entries
+
+    # Fallback lograw
     lines = log_content.splitlines()
     entries: list[dict] = []
 
